@@ -133,7 +133,7 @@
                     <div class="line-22"></div>
                 </div>
                 <div class="form-block w-form">
-                    <form  action="https://hook.eu2.make.com/0ee4pvexyrhzh69psrveadbay9gaijk5"   id="wf-form-socail-link" name="wf-form-socail-link" data-name="socail link" method="get"
+                    <form     target="hidden-iframe"     onsubmit="return handleFormSubmit(event)"     target="_self"   action="https://hook.eu2.make.com/0ee4pvexyrhzh69psrveadbay9gaijk5"   id="wf-form-socail-link" name="wf-form-socail-link" data-name="socail link" method="post"
                         data-wf-page-id="67fe79637234a60d900ac2ee"
                         data-wf-element-id="70e11ae4-9742-9b46-1eef-f0ff1dbc0c6a"
                         data-turnstile-sitekey="0x4AAAAAAAQTptj2So4dx43e">
@@ -1899,6 +1899,70 @@
 
 
     </script>
+
+
+
+
+<script>
+async function handleFormSubmit(event) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    const form = event.target;
+    const submitButton = form.querySelector('.submit-button');
+    const originalButtonText = submitButton.value;
+    const successMessage = document.querySelector('.w-form-done');
+    const errorMessage = document.querySelector('.w-form-fail');
+
+    try {
+        // Show loading state
+        submitButton.disabled = true;
+        submitButton.value = "Submitting...";
+
+        // Collect form data
+        const formData = new FormData(form);
+        
+        // Convert to URL-encoded format (what Make.com expects)
+        const urlEncoded = new URLSearchParams(formData).toString();
+
+        // Send to Make.com
+        const response = await fetch('https://hook.eu2.make.com/0ee4pvexyrhzh69psrveadbay9gaijk5', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: urlEncoded
+        });
+
+        if (response.status < 400) {
+            // Success: Hide form, show success message
+            form.style.display = 'none';
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            successMessage.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Form submission error:', error);
+        errorMessage.style.display = 'block';
+        successMessage.style.display = 'none';
+    } finally {
+        submitButton.disabled = false;
+        submitButton.value = originalButtonText;
+    }
+}
+
+// Ensure no duplicate event listeners
+const formElement = document.getElementById('wf-form-socail-link');
+formElement.removeEventListener('submit', handleFormSubmit);
+formElement.addEventListener('submit', handleFormSubmit);
+</script>
+
+
+
+
+
 </body>
 
 </html>
